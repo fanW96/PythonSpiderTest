@@ -45,17 +45,21 @@ while queue:
 
     # urllib.error.URLError: <urlopen error [WinError 10060] 无法连接，但是直接点击可以打开并且直接访问可以连接，第364
 
-    # 可能是网络访问策略限制：使用proxyHandler代理
+    # 1.可能是网络访问策略限制：使用proxyHandler代理
     # proxy_info = {'host': 'web-proxy.oa.com', 'port': 8080}# The proxy address and port:
     # proxy_support = urllib.request.ProxyHandler({"http": "http://%(host)s:%(port)d" % proxy_info})# We create a handler for the proxy
     # opener = urllib.request.build_opener(proxy_support)# We create an opener which uses this handler:
     # urllib.request.install_opener(opener)# Then we install this opener as the default opener for urllib2:
 
 
-    # 可能是网络不稳定的问题：可以尝试多次链接,for tries in range(10)
+    #2. 可能是网络不稳定的问题：可以尝试多次链接,for tries in range(10)
 
-    urlOp = urllib.request.urlopen(req)
-
+    # 3.添加超时跳过功能(最终选择)
+    # 运行后发现, 当发生超时, 程序因为exception中断.于是我把这一句也放在try.. except 结构里, 问题解决
+    try:
+        urlOp = urllib.request.urlopen(req ,timeout=2)
+    except:
+        continue
 
     # 检测抓取到的文件类型，确认是html再继续分析：可能会存在ico或jpg的连接，这样在将bytes进行decode('UTF-8')解码的时候会抛出异常
     if 'html' not in urlOp.getheader('Content-Type'):
